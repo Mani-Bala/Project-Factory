@@ -1,0 +1,264 @@
+= RESTful Contracts API Guide
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:nofooter:
+:sectnums:
+
+++++
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="domain.js">
+</script>
+++++
+
+[.text-right]
+link:index.html[Back To Index]
+
+[[overview]]
+== Overview
+This document describes the RESTful Contracts and resources provided by Revature Project.
+
+RESTful Contracts provides access to resources via URI paths. HTTP requests are supported to RESTful Contracts' URIs. The request and response payload content type is in most cases `application/json`.
+
+[[httpMethods]]
+== HTTP Methods
+RESTful Contracts tries to follow as closely as possible the standard HTTP and REST conventions in its use of HTTP methods.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PUT`
+| Used to update an existing resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[httpStatusCodes]]
+== HTTP Status Codes
+RESTful Contracts tries to follow as closely as possible the standard HTTP and REST conventions in its use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| Everything worked as expected.
+
+| `201 Created`
+| The request has succeeded and a new resource has been created as a result of it.
+
+| `202 Accepted`
+| The request has been received but not yet acted upon. It is non-committal, meaning that there is
+no way in HTTP to later send an asynchronous response indicating the outcome of processing the request.
+It is intended for cases where another process or server handles the request, or for batch processing.
+
+| `400 Bad Request`
+| The request was unacceptable, often due to missing a required parameter. The response body will include an error providing further information
+
+| `401 Unauthorized`
+| No valid API key provided.
+
+| `403 Forbidden`
+| TThe API key doesn't have permissions to perform the request.
+
+| `404 Not Found`
+| The requested resource doesn't exist.
+
+| `405 Method Not Allowed`
+| The request method is known by the server but has been disabled and cannot be used. For example, an API
+may forbid DELETE-ing a resource. The two mandatory methods, GET and HEAD, must never be disabled and should
+not return this error code.
+
+| `406 Not Acceptable`
+| This response is sent when the web server, after performing server-driven content negotiation, doesn't
+find any content following the criteria given by the user agent.
+
+| `408 Request Timeout`
+| This response is sent on an idle connection by some servers, even without any previous request by the client. It means that the server would like to shut down this unused connection. This response is used much more since some browsers, like Chrome, Firefox 27+, or IE9, use HTTP pre-connection mechanisms to speed up surfing. Also note that some servers merely shut down the connection without sending this message.
+
+| `409 Conflict`
+| The request conflicts with another request (perhaps due to using the same idempotent key).
+
+| `415 Unsupported Media Type`
+| The media format of the requested data is not supported by the server, so the server is rejecting the request.
+
+| `422 Unprocessable Entity`
+| The request was well-formed but was unable to be followed due to semantic errors.
+
+| `500 Internal Server Error`
+| The server has encountered a situation it doesn't know how to handle.
+
+| `503 Service Unavailable`
+| The server is not ready to handle the request. Common causes are a server that is down for maintenance or that is overloaded. Note that together with this response, a user-friendly page explaining the problem should be sent. This responses should be used for temporary conditions and the Retry-After: HTTP header should, if possible, contain the estimated time before the recovery of the service. The webmaster must also take care about the caching-related headers that are sent along with this response, as these temporary condition responses should usually not be cached.
+|===
+
+[[GeneralFeatures]]
+== General Features
+=== Authentication
+All secure RESTful Contracts requires client to authenticate using a authorized `encryptedToken` header.
+
+.Example: http request with encrypted token header
+----
+GET /secure/projects HTTP/1.1
+Content-Type: application/json
+encryptedToken: ENCRYPTED_TOKEN
+Host: localhost:8087
+----
+
+.Example: curl request with encrypted token header
+----
+$ curl 'http://localhost:8087/secure/projects' -i -X GET \
+    -H 'Content-Type: application/json' \
+    -H 'encryptedToken: ENCRYPTED_TOKEN'
+----
+
+.Example: httpie request with encrypted token header
+----
+$ http GET 'http://localhost:8087/secure/projects' \
+    'Content-Type:application/json' \
+    'encryptedToken:ENCRYPTED_TOKEN'
+----
+
+Requests without proper `encryptedToken` header will result in 401 Unauthorized response with payload containing status, error, and message in response body.
+
+----
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+Content-Length: 1180
+{
+  "timestamp": 1588242490892,
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "{"statusCode":401,"description":"Token verification fails","data":null}"
+}
+----
+
+[[errors]]
+== Errors
+Whenever an error response (status code >= 400) is returned, the body will contain a JSON object that describes the problem (see below for example payloads). Examples of possible error cases include:
+
+* Client permissions rights are not sufficient.
+* User permissions are not sufficient.
+* Mandatory information is missing.
+* Information is in incorrect format, e.g. email address is invalid.
+
+=== 400 Bad Request
+==== Validation Errors
+Validation errors occur when request payload can be successfully mapped from JSON, but is semantically wrong.
+
+Example: validation error with empty username, projectId,.
+----
+POST /secure/project/1 HTTP/1.1
+Content-Type: application/json
+Content-Length: 62
+{
+}
+----
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+{
+    "statusCode": 400,
+    "description": "Validation failed",
+    "error": {
+        "systemUser.email": "email id must not be empty",
+        "systemUser.password": "password must not be empty"
+    }
+}
+----
+=== 422 Unprocessable Entity
+This is used when server understands the content type of the request entity, and the syntax of the request entity is correct, but it was unable to process the contained data
+
+Example: validation error with empty template with incorrect format
+----
+POST /secure/project/1 HTTP/1.1
+Content-Type: application/json
+Content-Length: 163
+{
+	"data" : {
+            "id" : 1,
+            "name" : "Project Name",
+            "description" : "Project Description",
+            "isActive" : true
+        }
+}
+----
+----
+HTTP/1.1 422 Unprocessable Entity
+Content-Type: application/json
+{
+    "statusCode": 422,
+    "description": "Invalid project id"
+}
+----
+=== 404 Not Found
+This is used both for non-existing resources and situations where the user does not have sufficient permissions to execute the operation.
+
+Example: not found
+----
+POST /secure/project/1 HTTP/1.1
+Content-Type: application/json
+Content-Length: 163
+{
+	"data" : {
+            "id" : 1,
+            "name" : "Project Name",
+            "description" : "Project Description",
+            "isActive" : true
+        }
+}
+----
+----
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+{
+    "timestamp": 1588255325488,
+    "status": 404,
+    "error": "Not Found",
+    "message": "No message available",
+    "path": "/secure"
+}
+----
+=== 500 Internal Server Error
+This is used for something has gone wrong on the web site's server but the server could not be more specific on what the exact problem is
+
+Example: Internal Server Error
+----
+POST /secure/project/1 HTTP/1.1
+Content-Type: application/json
+Content-Length: 163
+{
+	"data" : {
+            "id" : 1,
+            "name" : "Project Name",
+            "description" : "Project Description",
+            "isActive" : true
+        }
+}
+----
+----
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+{
+    "statusCode": 500,
+    "description": "Something went wrong"
+}
+----
+
+[.text-right]
+link:index.html[Back To Index]

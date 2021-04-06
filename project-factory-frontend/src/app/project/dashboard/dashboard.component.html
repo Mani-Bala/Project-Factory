@@ -1,0 +1,205 @@
+<div id="proList">
+  <div class="col-md-12 mt-4">
+    <div class="row mt-3">
+      <div class="col-md-12 pr-5 text-right">
+        <button type="button" id="proListCreateNewBtn" class="btn btn-primary mt-2"
+                (click)='gotoProjectCreation()' mdbWavesEffect> <span class="fa fa-plus"></span> Create New </button>
+      </div>
+
+    </div>
+  </div>
+  <ngx-spinner bdColor = "rgba(0,0,1,0.8)" size = "medium" color = "#fff" type = "square-jelly-box" [fullScreen] = "true"><p style="color: white" > Loading... </p></ngx-spinner>
+
+<div class="container-fluid px-5 my-5 mb-100px">
+  <div class="row error-msg-outer-container" id="curDashErrMsgCont" *ngIf="isProjectsEmpty">
+    <div class="col-md-12 error-msg-inner-container">
+      <div class="row no-margin">
+        <div class="col-md-12 text-center"> <img src="../../../{{BASE_HREF}}assets/img/street-view.png"
+           class="img-fluid"> </div>
+        <div class="col-md-12 mt-4 text-center">
+          <p class="no-margin" id="curDashErrMsg">No projects to show</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-100px" >
+    <div class="col-md-6">
+      <div class="d-inline font-weight-500 new-pool-button">
+        Display
+        <div class="dropdown d-inline" dropdown>
+          <button id="projectPagiBtnDpdwn" dropdownToggle type="button"
+                  class="btn btn-primary dropdown-toggle waves-light select-batch-dropdown alignment-dropdown width-100 d-inline-block text-truncate display-records"
+                  mdbWavesEffect>{{pagination.itemsPerPage}}</button>
+          <div class="dropdown-menu dropdown-menu-right dropdown-default rows-per-page-dropdown-width"
+               style="max-height: 300px;overflow-y: auto; top: -22px; min-width: 0;"> <a href="#"
+                                                                                         onclick="return false;" class="dropdown-item white-space-wrap"
+                                                                                         *ngFor="let num of pagination.pageNumItemOptions"
+                                                                                         (click)="selectNumberOfItems(num.value)">{{num.value}}</a> </div>
+        </div>
+        records </div>
+    </div>
+    <div class="col-md-6 mx-auto" *ngIf="!isProjectsEmpty">
+      <div class="md-form offset-6">
+        <span class="fa fa-search prefix" id="proListbatDashTblHdrSrchIcn" ></span>
+        <input type="text" class="form-control" [(ngModel)]="searchText" (keyup)="searchItems()" id="search-input"
+               mdbInput>
+        <label for="search-input">Search for keywords</label>
+      </div>
+    </div>
+    <table mdbTable #tableEl="mdbTable" stickyHeader="true" hover="true" striped="true" class="z-depth-1" [hidden]="isProjectsEmpty">
+      <thead class="sticky-top">
+      <tr>
+        <th *ngFor="let head of headTitles; let i = index"
+            scope="col">{{head | titlecase}} <mdb-icon class="pointer" [mdbTableSort]="elements" [sortBy]="headElements[i]" fas icon="sort"></mdb-icon>
+        </th>
+        <th class="text-center">Actions</th>
+      </tr>
+      </thead>
+      <tbody #row>
+      <tr mdbTableCol *ngFor="let el of elements; let i = index">
+        <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex" scope="row" class="green-text ng-star-inserted" style="font-weight: 400;" ><span (click)="getProjectInfo(el.id);projectInfoModal.show();" class="pointer">{{el.name}}</span></td>
+        <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.categoryName}}</td>
+        <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">{{el.employeeName}}</td>
+        <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex">
+          <button mdbBtn color="{{el.isActive? 'green' :'light-green'}}" size="sm" mdbWavesEffect type="button" (click)="setProjectInfo(el);activateModal.show()"
+          [disabled]="isActivateTriggered" class="m-0 w-90" style="font-size: 8px;">{{el.isActive? 'Active': 'Inactive'}}</button>
+        </td>
+
+        <td *ngIf="i+1 >= mdbTablePagination.firstItemIndex && i < mdbTablePagination.lastItemIndex" class="text-center">
+          <div class="btn-group">
+           <a onclick="return false;"
+             class="btn py-0 px-1 btn-link text-default text-decoration" title="Delete" data-toggle="modal" (click)="setProjectInfo(el);deleteConfirmModal.show()">
+              <span class="fas fa-trash-alt pt-1 text-danger" style="font-size: 20px;"></span> </a>
+          </div>
+
+          </tr>
+      </tbody>
+          <tfoot class="grey lighten-5 w-100">
+              <tr>
+                <td colspan="6">
+                  <mdb-table-pagination [tableEl]="tableEl" paginationAlign="" [searchDataSource]="elements"></mdb-table-pagination>
+               </td>
+              </tr>
+          </tfoot>
+      </table>
+      </div>
+    </div>
+</div>
+
+<!--Activate/Deactivate Modal-->
+<div mdbModal #activateModal="mdbModal" class="modal fade top" id="activateModal" tabindex="-1" role="dialog"
+     [config]="{backdrop: true, ignoreBackdropClick: true, keyboard: false}" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content text-center">
+      <!--Header-->
+      <div class="modal-header d-flex justify-content-center">
+        <p class="heading">Are you sure you want to {{selectedProject?.isActive ? 'deactivate' : 'activate'}} project {{selectedProject?.name}}? </p>
+      </div>
+      <!--Body-->
+      <div class="modal-body"> <i *ngIf="selectedProject?.isActive" class="fa fa-times fa-4x animated rotateIn"></i>
+        <i *ngIf="!selectedProject?.isActive" class="fa fa-check fa-4x animated rotateIn"></i> </div>
+      <!--Footer-->
+      <div class="modal-footer flex-center">
+        <button type="button" class="btn btn-link waves-light" aria-label="Close" (click)="activateModal.hide()"
+                mdbWavesEffect>No</button>
+        <button type="button" class="btn btn-primary waves-light" [disabled]="isActivateTriggered"
+                (click)="activateDeactivateProject(selectedProject.id,selectedProject.isActive)" mdbWavesEffect>Yes</button>
+      </div>
+    </div>
+    <!--/.Content-->
+  </div>
+</div>
+<!--Activate/Deactivate Modal-->
+
+<!--Delete Modal-->
+<div mdbModal #deleteConfirmModal="mdbModal" class="modal fade top" id="proListdeleteConfirmModal" tabindex="-1"
+     role="dialog" aria-labelledby="myModalLabel" [config]="{backdrop: true, ignoreBackdropClick: true, keyboard: false}"
+     aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content text-center">
+      <!--Header-->
+      <div class="modal-header d-flex justify-content-center">
+        <p class="heading">Are you sure you want to delete project {{selectedProject?.name}}?</p>
+      </div>
+      <!--Body-->
+      <div class="modal-body"> <em class="fa fa-times fa-4x animated rotateIn"></em> </div>
+      <!--Footer-->
+      <div class="modal-footer flex-center">
+        <button type="button" class="btn btn-link waves-light" aria-label="Close" (click)="deleteConfirmModal.hide()"
+                mdbWavesEffect>No</button>
+        <button type="button" class="btn btn-primary waves-light" (click)='deleteProject();'
+                [disabled]="isDeleteTriggered" mdbWavesEffect>Yes</button>
+      </div>
+    </div>
+    <!--/.Content-->
+  </div>
+</div>
+<!--Delete Modal-->
+
+<!--project info modal-->
+<div mdbModal #projectInfoModal="mdbModal" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="myBasicModalLabel" [config]="{backdrop: true, ignoreBackdropClick: true, keyboard: false}"
+     aria-hidden="true" id="projInfModal">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg modal-notify modal-info" role="document">
+    <div class="modal-content">
+      <div class="modal-header" id="projInfModalClsBtnDiv">
+        <button type="button" id="projInfModalClsBtn" class="close pull-right" aria-label="Close"
+                (click)="projectInfoModal.hide(); resetProject()"> <span aria-hidden="true">×</span> </button>
+        <h4 class="modal-title w-100" id="myModalLabel">{{ selectedProject?.name }}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="select-project-modal">
+          <div class="row">
+
+            <div class="col-12">
+              <div class="mb-3">
+                <table mdbTable stickyHeader="true" hover="true" striped="true" class="z-depth-1">
+                  <tbody>
+                  <tr mdbTableCol>
+                    <th>Category</th><th>{{selectedProject?.category?.name}}</th>
+                  </tr>
+                  <tr mdbTableCol>
+                    <th>Created By</th><th>{{selectedProject?.createdBy?.firstName +' ' +selectedProject?.createdBy?.lastName}}</th>
+                  </tr>
+                  <tr mdbTableCol>
+                    <th>Active</th><th>{{selectedProject?.isActive}}</th>
+                  </tr>
+                  <tr mdbTableCol *ngIf="selectedProject?.description">
+                    <th>Description</th><th>{{ selectedProject?.description }}</th>
+                  </tr>
+                  </tbody>
+                </table>
+
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="mb-3">
+                <label class="d-block">Skills :</label>
+                <table mdbTable stickyHeader="true" hover="true" striped="true" class="z-depth-1">
+                  <thead>
+                  <tr><th>Skill Name</th><th>Score</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr mdbTableCol *ngFor="let projectSkill of selectedProject?.projectSkills; let i = index">
+                    <th>{{projectSkill.skill.name}}</th>
+                    <th>{{projectSkill.score}}</th>
+                  </tr>
+                  </tbody>
+                </table>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" id="projInfModalBtnDiv">
+        <button type="button" id="projInfModalCnlBtn" mdbBtn class="waves-light btn btn-link" aria-label="Close"
+                (click)="projectInfoModal.hide(); resetProject()" mdbWavesEffect> Close </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+
+<div class="container-flex mt-3">
+  <div class="col-md-6 col-lg-6 top10 offset-3 px-4">
+    <div *ngIf="message?.type == 'SUCCESS'" class="alert alert-success" role="alert">{{message.message}}</div>
+    <div *ngIf="message?.type == 'ERROR'" class="alert alert-danger" role="alert">{{message.message}}</div>
+  </div>
+</div>
+
+<!-- Default form login -->
+<div class="col-md-4 offset-4 mt-5">
+  <form class="text-center border border-light p-5" action="#!">
+
+    <p class="h4 mb-4">Sign in</p>
+
+    <!-- Email -->
+    <input type="email" name="email" id="defaultLoginFormEmail" class="form-control mb-4" [(ngModel)]="email" placeholder="E-mail">
+
+    <!-- Password -->
+    <div class="md-form md-outline">
+      <input type="password" name="password" id="defaultLoginFormPassword" class="form-control mb-4" maxlength="30" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="Password">
+      <i [class]="showPassword ? 'fa fa-eye' : 'fa fa-eye-slash'" (click)="showPassword=!showPassword" style="position: absolute;right: 10px;top: 10px;"> </i>
+    </div>
+
+    <div class="d-flex justify-content-around">
+      <div>
+        <!-- Forgot password -->
+        <a href=""  routerLink="/forgot-password" >Forgot password?</a>
+      </div>
+    </div>
+
+    <!-- Sign in button -->
+    <button class="btn btn-info btn-block my-4" (click)="signIn()" type="submit">Sign in</button>
+
+  </form>
+</div>
+<!-- Default form login -->

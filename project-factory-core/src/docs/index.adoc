@@ -1,0 +1,32 @@
+= Project Factory API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:nofooter:
+:sectnums:
+
+++++
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="domain.js">
+</script>
+++++
+
+[[Introduction]]
+== Introduction
+. link:overview.html[RESTful Contracts API Guide]
+
+[[resources]]
+== Resources
+
+. link:app.html[Application Health Check API Documentation]
+
+. link:admin-auth.html[Admin Authentication Endpoints]
+
+. link:project.html[Project Endpoints]
+

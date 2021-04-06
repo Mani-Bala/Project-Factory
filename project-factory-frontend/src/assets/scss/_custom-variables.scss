@@ -1,0 +1,35 @@
+// Your custom variables
+$primary-color:        #4D3A4B !default;
+$primary-color-dark:   #261D25 !default;
+$secondary-color:      #FEC106 !default;
+$secondary-color-dark: #DDAA0E !default;
+$default-color:        #009688 !default;
+$default-color-dark:   #025850 !default;
+$info-color:           #3F51B4 !default;
+$info-color-dark:      #26316C !default;
+$success-color:        #3A823D !default;
+$success-color-dark:   #255327 !default;
+$warning-color:        #FEC106 !default;
+$warning-color-dark:   #DDAA0E !default;
+$danger-color:         #E5190B !default;
+$danger-color-dark:    #96130A !default;
+$label-border-color:   #707070 !default;
+$scroll-bar-color:     #46b2aa !default; 
+$unique-color:         #5C3256 !default;
+$unique-color-dark:    #3B2037 !default;
+
+//forms
+$input-filter-bg-color: #EDEAE0 !default;
+$radio-fill-color:      $default-color !default;
+
+//sidenav
+$sidenav-width:         120px !default;
+$sidenav-background-color: $primary-color !default;
+$sidenav-closed-padding: 10px !default;
+$sidenav-open-padding:  130px !default;
+
+//sidenav breakpoint
+$sidenav-breakpoint:    993px !default;
+
+// Typography
+$font-family-sans-serif: futura-pt, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", -apple-system, BlinkMacSystemFont, "Segoe UI",  !default;

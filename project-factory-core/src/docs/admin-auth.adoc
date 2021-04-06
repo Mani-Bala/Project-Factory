@@ -1,0 +1,107 @@
+= Admin authentication Endpoints
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+:sectnums:
+
+++++
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="domain.js">
+</script>
+++++
+
+[.text-right]
+link:index.html[Back To Index]
+
+[[Introduction]]
+== Introduction
+List of Rest API endpoints used to do `*login*`, `*forgot password*`, `*reset password*` functionality.
+
+NOTE: If API doesn't contain `*secure*` in Rest URI, `_i.e._` it can be accessed without encrypted token.
+
+[[login]]
+== Login with user credential
+
+API endpoint, which used to Login with existing user credential.
+
+=== Request
+include::{snippets}/login/http-request.adoc[]
+
+=== Response
+include::{snippets}/login/http-response.adoc[]
+
+=== Request Body
+include::{snippets}/login/request-body.adoc[]
+
+=== Response Body
+include::{snippets}/login/response-body.adoc[]
+
+=== Request Field
+include::{snippets}/login/request-fields.adoc[]
+
+===  Curl Request
+include::{snippets}/login/curl-request.adoc[]
+
+=== Httpie Request
+include::{snippets}/login/httpie-request.adoc[]
+
+[[forgotPassword]]
+== Forgot password
+
+API endpoint, which used to request temporary password with email address.
+
+=== Request Field
+include::{snippets}/forgot-password/request-fields.adoc[]
+
+===  Request
+include::{snippets}/forgot-password/http-request.adoc[]
+
+===  Response
+include::{snippets}/forgot-password/http-response.adoc[]
+
+=== Request Body
+include::{snippets}/forgot-password/request-body.adoc[]
+
+===  Response Body
+include::{snippets}/forgot-password/response-body.adoc[]
+
+===  Curl Request
+include::{snippets}/forgot-password/curl-request.adoc[]
+
+===  Httpie Request
+include::{snippets}/forgot-password/httpie-request.adoc[]
+
+[[resetPassword]]
+== Reset password
+
+API endpoint, which used to reset password when user login with temporary password.
+
+=== Request Field
+include::{snippets}/forgot-password/request-fields.adoc[]
+
+===  Request
+include::{snippets}/forgot-password/http-request.adoc[]
+
+===  Response
+include::{snippets}/forgot-password/http-response.adoc[]
+
+=== Request Body
+include::{snippets}/forgot-password/request-body.adoc[]
+
+===  Response Body
+include::{snippets}/forgot-password/response-body.adoc[]
+
+===  Curl Request
+include::{snippets}/forgot-password/curl-request.adoc[]
+
+===  Httpie Request
+include::{snippets}/forgot-password/httpie-request.adoc[]
+
+[.text-right]
+link:index.html[Back To Index]

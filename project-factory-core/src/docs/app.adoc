@@ -1,0 +1,45 @@
+= Application Health Check API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+++++
+<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+<script src="domain.js">
+</script>
+++++
+
+[.text-right]
+link:index.html[Back To Index]
+
+[[Introduction]]
+== 1. Introduction
+Rest API endpoint to check `*project-factory*` application health status and metadata information.
+
+[[getHealthStatus]]
+== 2. Fetch project-factory application health status
+
+API endpoint, which used to fetch project-factory application health status and metadata information.
+
+=== 2.1. Request
+include::{snippets}/project-factory-getHealthStatus/http-request.adoc[]
+
+=== 2.2. Response
+include::{snippets}/project-factory-getHealthStatus/http-response.adoc[]
+
+=== 2.3. Response Body
+include::{snippets}/project-factory-getHealthStatus/response-body.adoc[]
+
+=== 2.4. Curl Request
+include::{snippets}/project-factory-getHealthStatus/curl-request.adoc[]
+
+=== 2.5. Httpie Request
+include::{snippets}/project-factory-getHealthStatus/httpie-request.adoc[]
+
+

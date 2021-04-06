@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+/** Bootstrap **/
+
+@import "node_modules/ng-uikit-pro-standard/assets/scss/bootstrap/bootstrap";
+
+$print-page-size:                   auto !default;
+$font-family-sans-serif: futura-pt, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", -apple-system, BlinkMacSystemFont, "Segoe UI",  !default; 
+
+body {
+     font-family: futura-pt, sans-serif !important;
+     font-weight: 400;
+  }	
+
+  @page {
+       size: auto;
+  }	
+
+/** Bootstrap END **/

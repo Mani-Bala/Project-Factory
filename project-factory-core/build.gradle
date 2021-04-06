@@ -1,0 +1,198 @@
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+buildscript {
+	ext {
+		springBootVersion = '2.2.0.RELEASE'
+		appName = 'project-factory'
+	}
+	repositories {
+		mavenCentral()
+		jcenter()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath "org.asciidoctor:asciidoctor-gradle-base:2.4.0"
+		classpath "com.diffplug.spotless:spotless-plugin-gradle:3.27.0"
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.2.0.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id "org.asciidoctor.convert" version "2.4.0"
+	id "com.diffplug.gradle.spotless" version "3.27.0"
+	id 'java'
+	id 'idea'
+	id 'eclipse-wtp'
+	id "jacoco"
+	id "org.sonarqube" version "2.8"
+	id "com.adarshr.test-logger" version "2.0.0"
+}
+
+group = 'com.revature'
+version = '0.0.1'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+spotless {
+	java {
+		importOrder 'java', 'javax', 'org', 'com', ''
+		removeUnusedImports()
+		eclipse().configFile 'tools/style.xml'
+	}
+}
+/* Application version builder START */
+/* Private methods to get Build related information START */
+def getAppVersion() {
+	def appVersion = System.getenv('BUILD_NUMBER')
+	if(appVersion==null){
+		appVersion = "unknown"
+	}
+	return appVersion
+}
+
+def getBranchName() {
+	def branchName = System.getenv('GIT_BRANCH')
+	if (branchName == null) {
+		branchName = "unknown"
+	}
+	return branchName
+}
+
+def getGitHash() {
+	def gitHash=System.getenv('GIT_COMMIT')
+	if(gitHash==null){
+		gitHash = "unknown"
+	}
+	return gitHash
+}
+/* Private methods to get Build related information END */
+
+task appVersionBuilder{
+	doLast {
+		new File("$projectDir" + "/src/main/resources/version.properties").text =
+				"""
+	app.version=${getAppVersion()}
+    app.release=${version}
+	git.revision=${getGitHash()}
+	git.branch.name=${getBranchName()}
+	app.build.time=${DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now(ZoneId.of("UTC")))}
+	"""
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled true
+	}
+}
+
+/* Application version builder END */
+bootJar.dependsOn(appVersionBuilder)
+bootJar.dependsOn(test)
+test.finalizedBy(asciidoctor)
+test.finalizedBy(jacocoTestReport)
+/* Generate docs while running build START */
+asciidoctor {
+	sourceDir 'src/docs'
+	outputDir 'target/generated-docs'
+	attributes 'snippets': file('target/generated-snippets')
+}
+/* Generate docs while running build END */
+
+/* Copy generated resources from target to static folder to serve those files START */
+task copyScript(type: Copy){
+	from("src/docs/domain.js","target/generated-docs/html5")
+	into "src/main/resources/static/docs"
+}
+asciidoctor.finalizedBy(copyScript)
+/* Copy generated resources from target to static folder to serve those files END */
+
+/* Delete the target folder while cleaning the build START */
+task deleteResources(type: Delete) {
+	delete 'target'
+	delete 'out'
+}
+clean.finalizedBy(deleteResources)
+/* Delete the target folder while cleaning the build END */
+
+task codeCoverageReport(type: JacocoReport) {
+	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+	reports {
+		xml.enabled true
+		html.enabled true
+		csv.enabled false
+	}
+}
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/milestone" }
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation ('org.springframework.boot:spring-boot-starter-log4j2')
+	runtimeOnly 'mysql:mysql-connector-java'
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+	}
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+	// Spring REST Docs
+	implementation 'org.springframework.restdocs:spring-restdocs-core:2.0.4.RELEASE'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:2.0.4.RELEASE'
+
+	// common utils jars
+	implementation 'org.apache.commons:commons-lang3:3.9'
+	implementation 'org.apache.commons:commons-collections4:4.4'
+
+	// Json jars
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+	implementation 'com.google.code.gson:gson:2.8.6'
+	implementation 'org.json:json:20190722'
+
+	// HTTP Clients
+	implementation 'org.apache.httpcomponents:httpmime:4.5.10'
+
+	// Javax Injection
+	implementation 'javax.inject:javax.inject:1'
+
+	compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-sleuth', version: '2.2.0.RELEASE'
+
+	// model mapper
+	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.6'
+
+	// Auth jars
+	compile group: 'com.auth0', name: 'java-jwt', version: '3.2.0'
+
+	// mail
+	compile('org.springframework.boot:spring-boot-starter-mail')
+	compile('org.springframework.boot:spring-boot-starter-freemarker')
+	compile group: 'org.apache.poi', name: 'poi', version: '3.9'
+	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+	compile group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: '3.9'
+
+	// Mockito
+	testImplementation("org.mockito:mockito-core:3.2.4")
+	testImplementation 'org.powermock:powermock-api-mockito2:2.0.4'
+	testImplementation 'org.powermock:powermock-module-junit4:2.0.4'
+}
+
+configurations {
+	all {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
+}

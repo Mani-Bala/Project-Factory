@@ -1,0 +1,16 @@
+<div class="dropdown-menu dropdown-menu-right dropdown-default cur-type-drop search-dropdown" id="{{dropDownId}}">
+  <div>
+    <div class="md-form no-margin">
+      <input type="text" [placeholder]='placeholder' id="{{dropDownId}}-searchTxt"
+             (keyup)="searchDataList(searchText,$event)" (keyup.arrowdown)="navigateDown()" (keyup.enter)="getOptionDetails()"
+             (keyup.arrowUp)="navigateUp()" (keydown.arrowdown)="preventArrowInTextField($event)" (keydown.arrowUp)="preventArrowInTextField($event)"
+             (click)="stopClosing($event)" autocomplete="off" [(ngModel)]='searchText'
+             class="form-control">
+      <span class="fa fa-search" id="batDrpDwnSrchIcn" (click)="stopClosing($event)"></span>
+    </div>
+    <a class="dropdown-item white-space-wrap"
+       *ngFor='let col of dataCopy;let i=index;' id="{{dropDownId}}-option{{i}}"
+       (click)="selectOption(col,$event)" [ngClass]="{'in-active':   col?.isActive == false, 'selectedIdActive': col?.id == selectedId && type == 'trainingTrack'}">{{col[key]}}</a>
+    <div class="black-text text-center" [hidden]="!searchNoResult"> Search yielded no results</div>
+  </div>
+</div>

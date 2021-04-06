@@ -1,0 +1,14 @@
+.vscode*
+.idea*
+.sonar*
+.project
+.brackets.json
+.settings
+build
+node_modules
+*.iml
+.sonar*
+.tern-project
+frontend-build*
+package-lock.json
+dist

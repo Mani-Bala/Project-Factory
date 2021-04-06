@@ -1,0 +1,154 @@
+<div class="container-fluid mt-5" id="projCr">
+  <h3 class="quiz text-uppercase" style="font-family: initial;"><b>Project Details</b></h3>
+  <div class="row mt-2">
+    <div class="col-6 mt-2"  id="projCrBackBut">
+      <button class="btn btn-primary btn-sm" title="Go back"
+              (click)="goBack()"> <span class="fa fa-arrow-left p-2"></span> Back</button>
+    </div>
+    <div class="col-6 mt-2 text-right">
+      <button class="btn btn-primary" id="projClr" [disabled]="isSaveTriggered" (click)="clearProject()"
+              mdbwaveseffect>Reset</button>
+      <button class="btn btn-primary" id="projCrPub" [disabled]="isSaveTriggered" (click)="submitProject()"
+              mdbwaveseffect>Save</button>
+    </div>
+  </div>
+  <div class="row pt-4">
+    <div class="col-12">
+      <div class="col-5 pl-1">
+        <div *ngIf='message.type == "ERROR" && !skillMessage' class='red-text text-center mt-3 mb-2'
+             id="projErrMsgCont"> <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {{message.message}} </div>
+        <div *ngIf='message.type == "SUCCESS" && !skillMessage' class='green-text text-center mt-3 mb-2'
+             id="projSucsMsgCont"> <i class="fa fa-check-circle" aria-hidden="true"></i> {{message.message}} </div>
+      </div>
+    </div>
+    <div class="col-6 py-3">
+      <div class="form-group pl-1 mb-2">
+        <label class="no-margin input-heading" for="projCrProjName">Project Name</label>
+        <div class="md-form no-margin">
+          <input class="form-control ng-pristine ng-valid ng-touched" id="projCrProjName"
+                 placeholder="Enter Project Name" type="text" maxlength="200" [(ngModel)]="project.name"
+                 (ngModelChange)="updateIsDataChanged()">
+
+          <div *ngIf="submitted" class='red-text'>
+            <div *ngIf="isProjectNameRequired">Please enter the project name</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 p-0 pl-1 mb-2">
+        <div class="form-group">
+          <label class="no-margin input-heading">Category</label>
+          <div class="md-form no-margin">
+
+            <div class="dropdown d-inline-block" mdbDropdown>
+              <!--Trigger-->
+              <button mdbDropdownToggle mdbBtn class="btn btn-primary dropdown-toggle waves-light waves-effect"
+                      [disabled]="isCategoriesEmpty" type="button" mdbWavesEffect id="actMoreAsnTypeSelect"> {{selectedCategory?.name ? selectedCategory.name : 'Select Category'}} </button>
+              <!--Menu-->
+              <div class="dropdown-menu dropdown-default"> <a href="#" onclick="return false;"
+                *ngFor='let category of categories'> <span class="dropdown-item"
+                (click)='selectCategory(category)'>{{category.name}}</span></a> </div>
+            </div>
+            <div *ngIf="submitted" class='red-text'>
+              <div *ngIf="isCategoryRequired">Please select the category</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 p-0 pl-1 mb-2">
+        <label class="input-heading">Description</label>
+        <div class="md-form focus-textarea pr-2 active-focus-textarea-2 no-margin">
+          <textarea class="form-control" placeholder="Enter the description" rows="7" id="projCrAddSetDesc"
+                    type="text" minlength="0" maxlength="8000" length="8000" [(ngModel)]="project.description"
+                    (ngModelChange)="updateIsDataChanged()" ></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="col-12">
+        <div class="py-2">
+          <label class="input-heading">Project Skill</label>
+          <div class="md-form">
+            <div class="dropdown d-inline-block" mdbDropdown>
+              <!--Trigger-->
+              <button mdbDropdownToggle mdbBtn class="btn btn-primary dropdown-toggle waves-light waves-effect"
+                 type="button" mdbWavesEffect id="selectSkill" [disabled]="!skills || skills.length === 0">Select Skill </button>
+              <!--Menu-->
+              <div class="dropdown-menu dropdown-default"> <a href="#" onclick="return false;"
+                 *ngFor='let skill of skills'> <span class="dropdown-item"
+                 (click)='onSkillSelected(skill)'>{{skill.name}}</span></a> </div>
+            </div>
+
+            <div *ngIf="submitted" class='red-text err-msg'>
+              <div *ngIf="isSkillRequired">Atleast one skill is required for the project. Please select the skills</div>
+            </div>
+          </div>
+          <div *ngIf="message.type == 'ERROR' && skillMessage" class='red-text pt-3' [textContent]='message.message'>
+          </div>
+
+        </div>
+        <div class="col-12 no-padding" *ngIf="selectedSkills.length > 0">
+          <div class="table-wrapper">
+            <div class="table-container" id="proListbatCurTblDiv">
+              <!--table filters row-->
+
+              <table mdbTable stickyHeader="true" hover="true" striped="true" class="z-depth-1">
+                <thead class="pt-2">
+                <tr>
+                  <th class="col-name pb-1"> <a class="d-inline-block" (click)="sortSkills('name')">SKILL NAME <span
+                    [class.fa-caret-down]='(skillColName == "name" && skillColSortType == "desc")'
+                    [class.fa-caret-up]='(skillColName == "name" && skillColSortType == "asc")'
+                    [class.fa-sort]='(skillColName != "name")' class="fa float-right pr-1 pt-1"></span> </a> </th>
+                  <th class="col-name text-center pb-1"> <a class="d-inline-block"
+                                                            (click)="sortSkills('score')">EQUIVALENCY <span
+                    [class.fa-caret-down]='(skillColName == "score" && skillColSortType == "desc")'
+                    [class.fa-caret-up]='(skillColName == "score" && skillColSortType == "asc")'
+                    [class.fa-sort]='(skillColName != "score")' class="fa float-right pr-1 pt-1"></span> </a> </th>
+                  <th class="col-name text-center pb-1"><span class="d-inline-block"></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let skill of selectedSkills">
+                  <td scope="row" class="text-truncate max-width-200" title="{{skill.name}}">{{skill.name}}</td>
+                  <td scope="row" class="text-center"><input type="number" id="projCrRandCheckNum" style="width: 75px;"
+                                                             min="1" max="999" maxlength="3" onpaste="return false;" ondrop="return false;"
+                                                             ondragstart="return false" autocomplete="off" (keyup)="restrictToMaxLength($event, skill)"
+                                                             [(ngModel)]="skill.score" (keyup.enter)="checkValidScore(skill)"
+                                                             (focusout)="checkValidScore(skill)" appOnlyNumbers></td>
+                  <td scope="row" class="text-center"><a onclick="return false;"
+                                                         class="btn py-0 px-1 btn-link text-default text-decoration" title="Remove"
+                                                         (click)="setSkillToRemove(skill);deleteConfirmModal.show()" data-toggle="modal"
+                                                         data-target="#basicExample"><span class="fas fa-trash-alt pt-1 text-danger"></span></a></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div mdbModal #deleteConfirmModal="mdbModal" class="modal fade top" id="deleteConfirmModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" [config]="{backdrop: true, ignoreBackdropClick: true, keyboard: false}"
+     aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-notify modal-info" role="document">
+    <!--Content-->
+    <div class="modal-content text-center">
+      <!--Header-->
+      <div class="modal-header d-inline-block  justify-content-center">
+        <p class="heading d-inline-block">Are you sure you want to delete the skill </p>
+        <span class="max-width-200 heading break-word-format d-inline-block p-0">{{skillToRemove?.name}}?</span>
+      </div>
+      <!--Body-->
+      <div class="modal-body"> <i class="fa fa-times fa-4x animated rotateIn"></i> </div>
+      <!--Footer-->
+      <div class="modal-footer flex-center">
+        <button type="button" class="btn btn-link waves-light" aria-label="Close" (click)="deleteConfirmModal.hide()"
+                mdbWavesEffect>No</button>
+        <button type="button" class="btn btn-primary waves-light" (click)="removeSelectedSkills()"
+                mdbWavesEffect>Yes</button>
+      </div>
+    </div>
+    <!--/.Content-->
+  </div>
+</div>
