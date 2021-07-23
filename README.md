@@ -1,4 +1,4 @@
-# Project-Factory
+# Project-Factory (Demo App)
 
 This project contains both backend and frontend application.
 
